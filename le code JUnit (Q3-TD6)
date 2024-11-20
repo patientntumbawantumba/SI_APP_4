@@ -1,0 +1,75 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.Hashtable;
+
+public class UrlParserTest {
+
+    @Test
+    void testUrlAvecParametresComplets() {
+        UrlParser parser = new UrlParser("http://example.com/page?param1=value1&param2=value2");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertEquals(2, result.size(), "La table doit contenir 2 paramètres.");
+        assertEquals("value1", result.get("param1"), "La valeur de 'param1' doit être 'value1'.");
+        assertEquals("value2", result.get("param2"), "La valeur de 'param2' doit être 'value2'.");
+    }
+
+    @Test
+    void testUrlAvecParametresSansValeur() {
+        UrlParser parser = new UrlParser("http://example.com/page?param1=value1&param2=");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertEquals(2, result.size(), "La table doit contenir 2 paramètres.");
+        assertEquals("value1", result.get("param1"), "La valeur de 'param1' doit être 'value1'.");
+        assertEquals("", result.get("param2"), "La valeur de 'param2' doit être une chaîne vide.");
+    }
+
+    @Test
+    void testUrlSansParametres() {
+        UrlParser parser = new UrlParser("http://example.com/page");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertTrue(result.isEmpty(), "La table doit être vide car il n'y a pas de paramètres.");
+    }
+
+    @Test
+    void testUrlInvalide() {
+        UrlParser parser = new UrlParser("invalid_url");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNull(result, "La méthode doit retourner null pour une URL invalide.");
+    }
+
+    @Test
+    void testUrlAvecUneCleSansValeur() {
+        UrlParser parser = new UrlParser("http://example.com/page?param1");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertEquals(1, result.size(), "La table doit contenir 1 paramètre.");
+        assertEquals("", result.get("param1"), "La valeur de 'param1' doit être une chaîne vide.");
+    }
+
+    @Test
+    void testUrlAvecCaracteresSpeciaux() {
+        UrlParser parser = new UrlParser("http://example.com/page?param1=val%20ue1&param2=val%2F2");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertEquals(2, result.size(), "La table doit contenir 2 paramètres.");
+        assertEquals("val ue1", result.get("param1"), "La valeur de 'param1' doit être 'val ue1'.");
+        assertEquals("val/2", result.get("param2"), "La valeur de 'param2' doit être 'val/2'.");
+    }
+
+    @Test
+    void testUrlAvecParametresVides() {
+        UrlParser parser = new UrlParser("http://example.com/page?");
+        Hashtable<String, String> result = parser.parseParam();
+
+        assertNotNull(result, "La table de hachage ne doit pas être nulle.");
+        assertTrue(result.isEmpty(), "La table doit être vide car il n'y a pas de paramètres.");
+    }
+}
